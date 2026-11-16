@@ -1,0 +1,28 @@
+# LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+
+# Node / web app
+node_modules/
+dist/
+
+# Python
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+
+# Datos grandes (NSynth, grabaciones crudas)
+datos/nsynth/
+*.tfrecord
+
+# Enunciado del curso (material de la profesora, no se publica)
+Proyectos sugeridos*.pdf

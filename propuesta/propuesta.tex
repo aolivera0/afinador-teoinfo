@@ -1,0 +1,168 @@
+\documentclass[conference,a4paper]{IEEEtran}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-noshorthands,es-tabla,es-nodecimaldot]{babel}
+\usepackage{csquotes}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta}
+\usepackage[hidelinks]{hyperref}
+\usepackage[style=apa,backend=biber]{biblatex}
+\addbibresource{referencias.bib}
+\renewcommand*{\bibfont}{\footnotesize}
+
+\newcommand{\fo}{f_0}
+\renewcommand{\IEEEkeywordsname}{Palabras clave}
+
+\begin{document}
+
+\title{Afinador cromático web: estimación de la\\ frecuencia fundamental con FFT, HPS y YIN}
+
+\author{
+\IEEEauthorblockN{Nombre Apellido 1 \quad Nombre Apellido 2}
+\IEEEauthorblockA{Programa de Ingeniería de Sistemas y Computación\\
+Universidad Nacional de Colombia, Bogotá\\
+\{usuario1, usuario2\}@unal.edu.co}
+}
+
+\maketitle
+
+\begin{abstract}
+Se propone construir una aplicación web que afine guitarra, bajo, ukelele, violín y chelo, y que en modo automático identifique cualquier nota y la cuerda que se está pulsando. El núcleo del trabajo es la estimación de la frecuencia fundamental $\fo$: se implementarán y compararán tres métodos ---pico de la FFT con interpolación parabólica, producto espectral de armónicos (HPS) y YIN--- frente a la lectura del espectro en Audacity, dos afinadores comerciales y las etiquetas del conjunto de datos NSynth. Se medirá el error en cents, la tasa de errores de octava, la latencia y la degradación con el ruido, y se analizará el contenido armónico para comparar el timbre de dos instrumentos en la misma nota.
+\end{abstract}
+
+\begin{IEEEkeywords}
+frecuencia fundamental, transformada de Fourier, armónicos, YIN, entropía espectral, Web Audio.
+\end{IEEEkeywords}
+
+\section{Introducción}
+Afinar un instrumento consiste en llevar la frecuencia fundamental $\fo$ de cada nota a la de una referencia; en la música occidental, la escala de temperamento igual con La4 = 440~Hz. Aplicaciones como GuitarTuna o DaTuner hacen esto en un celular, pero funcionan como cajas negras. Estimar $\fo$ a partir de unos milisegundos de audio grabado con un micrófono comercial no es trivial, por cuatro razones:
+\begin{enumerate}
+\item \emph{Resolución en frecuencia.} La DFT de $N$ muestras tomadas a $f_s$ separa sus bins $\Delta f = f_s/N$. Con $N=4096$ a 48~kHz, $\Delta f = 11{,}7$~Hz, pero entre el Mi1 del bajo (41,20~Hz) y el Fa1 hay solo 2,45~Hz, y un cent equivale a 0,024~Hz. Para resolver un cent solo con bins harían falta unos 42~s de señal.
+\item \emph{Armónicos dominantes.} En muchas notas graves el segundo o tercer armónico tiene más energía que la fundamental, y es de esperar que los micrófonos de celulares y portátiles atenúen aún más las frecuencias bajas. Buscar el pico más alto lleva entonces a \emph{errores de octava}.
+\item \emph{Inarmonicidad.} La rigidez de las cuerdas desplaza los parciales por encima de los múltiplos enteros de $\fo$ \parencite{fletcher1998physics}.
+\item \emph{Ruido y transitorios} del ataque, que deben separarse del tramo estable de la nota.
+\end{enumerate}
+La literatura ofrece dos familias de soluciones. En el dominio de la frecuencia están el pico de la DFT refinado por interpolación \parencite{jacobsen2007fast}, el producto espectral \parencite{schroeder1968period,noll1970hps} y el cepstrum \parencite{noll1967cepstrum}. En el dominio del tiempo, la autocorrelación \parencite{rabiner1977autocorrelation} y sus refinamientos YIN \parencite{decheveigne2002yin} y MPM \parencite{mcleod2005smarter}, este último pensado para afinadores. Métodos recientes basados en redes neuronales, como CREPE \parencite{kim2018crepe}, superan el 90~\% de acierto con tolerancia de 10~cents, a cambio de un modelo entrenado. Este proyecto se centra en los métodos clásicos porque su comportamiento se explica a partir del espectro y los armónicos, y usa los datos etiquetados de NSynth \parencite{engel2017nsynth} para medir en qué casos falla cada uno.
+
+\section{Objetivos}
+\subsection{Objetivo general}
+Diseñar, implementar y evaluar un afinador web que estime en tiempo real la frecuencia fundamental de notas de instrumentos de cuerda y que compare métodos de estimación en el dominio de la frecuencia y del tiempo.
+
+\subsection{Objetivos específicos}
+\begin{enumerate}
+\item Implementar tres estimadores de $\fo$ (pico de FFT con interpolación parabólica, HPS y YIN) y contrastarlos con la lectura manual del espectro en Audacity.
+\item Desarrollar una aplicación web con un modo por instrumento (afinación estándar y alternativas comunes) y un modo cromático automático que identifique la nota y la cuerda pulsada.
+\item Cuantificar el error en cents, la tasa de errores de octava, la latencia y la robustez frente al ruido de cada método, tomando como referencia GuitarTuna, DaTuner y las etiquetas de NSynth.
+\item Analizar el contenido armónico de las notas y comparar el timbre de dos instrumentos que tocan la misma nota.
+\end{enumerate}
+
+\section{Marco teórico}
+\subsection{Temperamento igual y cents}
+En temperamento igual, la nota con número MIDI $m$ tiene frecuencia $f(m) = 440\cdot 2^{(m-69)/12}$~Hz. Dada una estimación $\hat f$, la nota más cercana y la desviación respecto a ella son
+\begin{align}
+\hat m &= \operatorname{round}\!\Big(69 + 12\log_2\frac{\hat f}{440}\Big),\\
+c &= 1200\log_2\frac{\hat f}{f(\hat m)},
+\end{align}
+donde $c$ está en cents (centésimas de semitono). Las afinaciones que soportará la aplicación se resumen en la Tabla~\ref{tab:afinaciones}; el rango va de 30,87~Hz (Si0 del bajo de cinco cuerdas) a 659,26~Hz (Mi5 del violín).
+
+\begin{table}[t]
+\centering
+\caption{Afinaciones previstas (de la cuerda más grave a la más aguda)}
+\label{tab:afinaciones}
+\footnotesize
+\begin{tabular}{@{}lll@{}}
+\toprule
+Instrumento & Afinación & Notas \\
+\midrule
+Guitarra & Estándar & Mi2 La2 Re3 Sol3 Si3 Mi4 \\
+         & Drop D & Re2 La2 Re3 Sol3 Si3 Mi4 \\
+         & Medio tono abajo & Mi$\flat$2 La$\flat$2 Re$\flat$3 Sol$\flat$3 Si$\flat$3 Mi$\flat$4 \\
+         & Open G & Re2 Sol2 Re3 Sol3 Si3 Re4 \\
+         & DADGAD & Re2 La2 Re3 Sol3 La3 Re4 \\
+Bajo     & 4 cuerdas & Mi1 La1 Re2 Sol2 \\
+         & Drop D & Re1 La1 Re2 Sol2 \\
+         & 5 cuerdas & Si0 Mi1 La1 Re2 Sol2 \\
+Ukelele  & Estándar (reentrante) & Sol4 Do4 Mi4 La4 \\
+         & Low G & Sol3 Do4 Mi4 La4 \\
+         & Barítono & Re3 Sol3 Si3 Mi4 \\
+Violín   & Estándar & Sol3 Re4 La4 Mi5 \\
+Chelo    & Estándar & Do2 Sol2 Re3 La3 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Modelo armónico, inarmonicidad y timbre}
+Una nota sostenida se modela como $x[n]=\sum_{k=1}^{K}A_k\cos(2\pi f_k n/f_s+\phi_k)+w[n]$, con $w[n]$ ruido. En una cuerda ideal $f_k = k\fo$; en una real, $f_k = k\fo\sqrt{1+Bk^2}$, donde el coeficiente de inarmonicidad $B$ crece con el diámetro y la rigidez de la cuerda \parencite{fletcher1998physics}. El \emph{timbre} depende principalmente de la distribución de las amplitudes $A_k$; por eso dos instrumentos pueden tocar la misma $\fo$ y sonar distinto.
+
+\subsection{Estimadores en frecuencia}
+La DFT de un tramo con ventana de Hann reduce la fuga espectral a costa de ensanchar el lóbulo principal \parencite{harris1978windows,oppenheim2010discrete}. Una ventana más larga mejora $\Delta f$ pero aumenta la latencia; este compromiso entre tiempo y frecuencia es central en un afinador. Si $\alpha,\beta,\gamma$ son las magnitudes logarítmicas en los bins $k-1,k,k+1$ alrededor del pico, la interpolación parabólica estima
+\begin{equation}
+\hat f = \Big(k+\tfrac12\,\tfrac{\alpha-\gamma}{\alpha-2\beta+\gamma}\Big)\frac{f_s}{N},
+\end{equation}
+con lo que se obtiene precisión mucho menor que un bin \parencite{jacobsen2007fast}. El HPS multiplica el espectro por versiones de sí mismo comprimidas en frecuencia, $P(f)=\prod_{r=1}^{R}|X(rf)|$; los armónicos se alinean sobre $\fo$ y el producto tiene un máximo allí aunque la fundamental sea débil \parencite{schroeder1968period,noll1970hps}.
+
+\subsection{Estimador YIN}
+YIN parte de la función de diferencia
+\begin{equation}
+d(\tau)=\sum_{j}(x_j-x_{j+\tau})^2,
+\end{equation}
+que se relaciona con la autocorrelación mediante $d(\tau)=r_t(0)+r_{t+\tau}(0)-2r_t(\tau)$ \parencite{rabiner1977autocorrelation}. Para evitar que el retardo cero gane, la normaliza por su media acumulada:
+\begin{equation}
+d'(\tau)=\frac{d(\tau)}{\frac{1}{\tau}\sum_{j=1}^{\tau}d(j)},\qquad d'(0)=1,
+\end{equation}
+y toma como período el primer $\tau$ cuyo $d'(\tau)$ cae por debajo de un umbral (típicamente 0,1), refinado con interpolación parabólica. Así reduce los errores de octava de la autocorrelación simple \parencite{decheveigne2002yin}.
+
+\subsection{Entropía espectral como detector de nota}
+Para no mostrar lecturas cuando no se toca nada, se normaliza el espectro de potencia como distribución, $p_k=|X_k|^2/\sum_j|X_j|^2$, y se calcula su entropía de Shannon normalizada \parencite{shannon1948mathematical}:
+\begin{equation}
+H=-\frac{1}{\log_2 K}\sum_{k=1}^{K}p_k\log_2 p_k\in[0,1].
+\end{equation}
+Una nota concentra la energía en pocos armónicos ($H$ baja), mientras que el ruido la reparte ($H\to1$). Este criterio se ha usado para detectar segmentos de voz en ambientes ruidosos \parencite{shen1998entropy}.
+
+\section{Metodología}
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  node distance=4mm and 3mm,
+  b/.style={draw, rounded corners=2pt, align=center, font=\scriptsize,
+            minimum height=8mm, text width=20mm},
+  a/.style={-{Stealth[length=2mm]}}]
+\node[b] (cap) {Captura\\ \texttt{getUserMedia}, 48 kHz};
+\node[b, right=of cap] (pre) {Preprocesado\\ pasa altas, ventana};
+\node[b, right=of pre] (gate) {Compuerta\\ RMS y entropía $H$};
+\node[b, below=of gate] (est) {Estimador de $\fo$\\ FFT $\cdot$ HPS $\cdot$ YIN};
+\node[b, left=of est] (nota) {Nota y cents\\ $\hat m$, $c$, mediana};
+\node[b, left=of nota] (ui) {Salida\\ cuerda e indicador};
+\draw[a] (cap) -- (pre); \draw[a] (pre) -- (gate); \draw[a] (gate) -- (est);
+\draw[a] (est) -- (nota); \draw[a] (nota) -- (ui);
+\end{tikzpicture}
+\caption{Cadena de procesamiento del afinador.}
+\label{fig:cadena}
+\end{figure}
+
+\subsection{Implementación}
+La aplicación correrá completamente en el navegador con la Web Audio API \parencite{w3c2021webaudio}: el audio se captura con la cancelación de eco, la supresión de ruido y el control automático de ganancia desactivados, y se procesa por tramos en un \texttt{AudioWorklet}, siguiendo la cadena de la Fig.~\ref{fig:cadena}. Se escribirá en TypeScript y se publicará en GitHub Pages. Tras la compuerta, cada estimador entrega $\hat f$, se convierte a $(\hat m, c)$ y se suaviza con una mediana de los últimos tramos. En el \emph{modo por instrumento} se elige la cuerda cuya frecuencia esté más cerca de $\hat f$ en cents, con histéresis para que la selección no oscile; en el \emph{modo cromático} se muestra cualquier nota. Una nota se considerará afinada si $|c|\le 5$~cents. El análisis offline y las figuras se harán en Python (NumPy, SciPy, Matplotlib). Para verificar que ambas implementaciones coinciden, se procesarán los mismos archivos WAV con las dos y se compararán los resultados.
+
+\subsection{Datos}
+\begin{itemize}
+\item \emph{Señales sintéticas} con $\fo$ exacta: tonos armónicos con y sin fundamental, con distintos valores de $B$ y con ruido gaussiano de SNR entre 30 y $-5$~dB.
+\item \emph{NSynth} \parencite{engel2017nsynth}: notas de 4~s a 16~kHz etiquetadas con su número MIDI. Se usarán las de las familias de guitarra, bajo y cuerdas frotadas del subconjunto de prueba, dentro del rango de la Tabla~\ref{tab:afinaciones}.
+\item \emph{Grabaciones propias} de guitarra, bajo y ukelele en WAV a 48~kHz y 16~bits: cada cuerda al aire y varias notas pisadas, tres repeticiones de unos 3~s, registrando al mismo tiempo la lectura de GuitarTuna y de DaTuner.
+\end{itemize}
+
+\subsection{Evaluación}
+Para cada método y cada tamaño de ventana $N\in\{2048,4096,8192,16384\}$ se medirán:
+\begin{itemize}
+\item el error absoluto medio en cents;
+\item el porcentaje de estimaciones a $\pm5$ y $\pm50$~cents de la referencia (afinación correcta y nota correcta);
+\item la tasa de errores de octava ($|c|\approx1200$);
+\item la latencia hasta la primera lectura estable.
+\end{itemize}
+La lectura del espectro en Audacity (Analizar $\rightarrow$ Trazar espectro) servirá como segundo método manual, tal como pide el enunciado. Con las señales sintéticas y NSynth se trazarán curvas de acierto frente a SNR para encontrar dónde falla cada método. Para el timbre se comparará La4 = 440~Hz en el ukelele (cuerda al aire) y en la guitarra (primera cuerda, quinto traste): amplitud relativa de los diez primeros armónicos, centroide espectral y una estimación de $B$.
+
+\printbibliography
+
+\end{document}
