@@ -12,6 +12,8 @@
 \usepackage[style=apa,backend=biber]{biblatex}
 \addbibresource{referencias.bib}
 \renewcommand*{\bibfont}{\footnotesize}
+% APA usa raya corta (en dash) en rangos de páginas; el estilo español de biblatex usa guion.
+\DefineBibliographyExtras{spanish}{\protected\def\bibrangedash{\textendash\penalty\hyphenpenalty}}
 
 \newcommand{\fo}{f_0}
 \renewcommand{\IEEEkeywordsname}{Palabras clave}
@@ -21,10 +23,15 @@
 \title{Afinador cromático web: estimación de la\\ frecuencia fundamental con FFT, HPS y YIN}
 
 \author{
-\IEEEauthorblockN{Nombre Apellido 1 \quad Nombre Apellido 2}
-\IEEEauthorblockA{Programa de Ingeniería de Sistemas y Computación\\
+\IEEEauthorblockN{Angel Humberto Olivera Pinzón}
+\IEEEauthorblockA{Ingeniería de Sistemas y Computación\\
 Universidad Nacional de Colombia, Bogotá\\
-\{usuario1, usuario2\}@unal.edu.co}
+aolivera@unal.edu.co}
+\and
+\IEEEauthorblockN{Carlos Julian Reyes Piraligua}
+\IEEEauthorblockA{Ingeniería de Sistemas y Computación\\
+Universidad Nacional de Colombia, Bogotá\\
+creyesp@unal.edu.co}
 }
 
 \maketitle
