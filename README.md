@@ -5,7 +5,7 @@ Proyecto final de **Teoría de la Información y Sistemas de Comunicación** (Un
 Afinador que corre en el navegador para guitarra, bajo, ukelele, violín y chelo, con un modo cromático automático que reconoce cualquier nota y la cuerda que se está pulsando. El núcleo del proyecto es estimar la frecuencia fundamental $f_0$ y comparar tres métodos: **pico de la FFT con interpolación parabólica**, **producto espectral de armónicos (HPS)** y **YIN**.
 
 - Propuesta: [`propuesta/propuesta.pdf`](propuesta/propuesta.pdf) (fuente en [`propuesta/propuesta.tex`](propuesta/propuesta.tex))
-- Autores: Angel Humberto Olivera Pinzón · Carlos Julian Reyes Piraligua
+- Autores: Angel Humberto Olivera Pinzón · Carlos Julian Reyes Piraligua · Diego Alberto Romero Olmos
 
 ---
 
@@ -17,7 +17,7 @@ Afinador que corre en el navegador para guitarra, bajo, ukelele, violín y chelo
 | 2. Artículo final | Propuesta + implementación, resultados, conclusiones, declaración de uso de IA | 30 % | _Por definir_ | ⏳ |
 | 3. Sustentación | Exposición de 8–10 min y preguntas | 60 % | _Por definir_ | ⏳ |
 
-> La nota no depende de que el código funcione, sino de lo que **los dos** demostremos entender de nuestros resultados. Cada uno debe poder explicar los tres métodos, aunque los haya programado el otro.
+> La nota no depende de que el código funcione, sino de lo que **los tres** demostremos entender de nuestros resultados. Cada uno debe poder explicar los tres métodos, aunque los haya programado otro integrante.
 
 ## Alcance
 
@@ -67,10 +67,11 @@ sustentacion/  Diapositivas y video de respaldo de la demo
 
 ## Plan de trabajo
 
-Hay dos frentes que avanzan en paralelo y se juntan en la evaluación:
+Hay tres frentes que avanzan en paralelo y se juntan en la validación cruzada y la evaluación. Todavía no están asignados:
 
-- **Frente A, app web:** Angel (propuesta, intercambiable)
-- **Frente B, análisis y datos:** Carlos (propuesta, intercambiable)
+- **Frente A:** app web
+- **Frente B:** estimadores de referencia en Python
+- **Frente C:** datos y evaluación
 
 El cronograma está en semanas relativas a partir de la entrega de la propuesta. Hay que ajustarlo cuando se conozca la fecha del artículo final.
 
@@ -79,10 +80,10 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [x] Revisión de literatura y referencias verificadas
 - [x] Borrador de la propuesta (3 páginas)
 - [x] Repositorio público en GitHub
-- [ ] Lectura completa de la propuesta por los dos y ajustes finales
+- [ ] Lectura completa de la propuesta por los tres y ajustes finales
 - [ ] Entregar la propuesta
 
-### Fase 1: Datos y referencia (semana 1) · Frente B
+### Fase 1: Datos y referencia (semana 1) · Frente C
 
 - [ ] Protocolo de grabación (ver abajo) y grabación de guitarra, bajo y ukelele
 - [ ] Anotar la lectura de GuitarTuna y DaTuner para cada grabación en `datos/grabaciones/lecturas.csv`
@@ -111,13 +112,13 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [ ] Interfaz: aguja/indicador de cents, nota, cuerda, estado afinado (±5 cents); usable en celular
 - [ ] Modo depuración: espectro en vivo, $H$ y $f_0$ de los tres métodos a la vez (sirve para la demo)
 
-### Fase 4: Validación cruzada (semana 3) · Ambos
+### Fase 4: Validación cruzada (semana 3) · Frentes A y B
 
 - [ ] Script en Node que procesa WAV con el código de la app y exporta CSV
 - [ ] Comparar con la salida de Python sobre los mismos archivos (diferencia < 0,1 cents)
 - [ ] Corregir discrepancias y documentar qué se verificó (insumo para la declaración de IA)
 
-### Fase 5: Evaluación y resultados (semanas 4–5) · Ambos
+### Fase 5: Evaluación y resultados (semanas 4–5) · Frente C lidera, todos participan
 
 - [ ] Barrido de $N \in \{2048, 4096, 8192, 16384\}$ para los tres métodos
 - [ ] Métricas sobre sintéticos, NSynth y grabaciones propias (ver definiciones abajo)
@@ -127,14 +128,14 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [ ] Timbre: La4 en ukelele (cuerda al aire) y guitarra (1.ª cuerda, traste 5): amplitud de los 10 primeros armónicos, centroide espectral, estimación de $B$
 - [ ] Respuesta en frecuencia aproximada del micrófono usado (¿cuánto atenúa por debajo de 100 Hz?)
 
-### Fase 6: Artículo final (semanas 5–6) · Ambos
+### Fase 6: Artículo final (semanas 5–6) · Todos
 
 - [ ] Copiar la propuesta a `articulo/` y añadir implementación, resultados y conclusiones
 - [ ] Figuras finales desde los notebooks (mismo estilo y tamaño de columna IEEE)
 - [ ] Declaración de uso de IA antes de las referencias, a partir del registro de abajo
-- [ ] Revisión cruzada: cada uno lee y corrige las secciones del otro
+- [ ] Revisión cruzada: cada uno lee y corrige las secciones de los demás
 
-### Fase 7: Sustentación (semanas 6–7) · Ambos
+### Fase 7: Sustentación (semanas 6–7) · Todos
 
 - [ ] Diapositivas para 8–10 minutos
 - [ ] Demo en vivo con la app (guitarra o ukelele) y video de respaldo por si falla el audio del salón
@@ -143,16 +144,16 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 
 ### Cronograma resumido
 
-| Semana | Frente A: app | Frente B: análisis | Juntos |
-|---|---|---|---|
-| 0 (→ 18 nov) | — | — | Cerrar y entregar propuesta |
-| 1 | Esqueleto, captura, AudioWorklet | Grabaciones, NSynth, sintéticos | — |
-| 2 | Estimadores en TS, nota y cents | Estimadores en Python + pruebas | Revisar juntos YIN y HPS |
-| 3 | Presets, detección de cuerda, interfaz | Notebook de métricas | Validación cruzada TS ↔ Python |
-| 4 | Modo depuración, latencia, pulido | Barrido de N, curvas de SNR | Análisis de casos de falla |
-| 5 | Despliegue final | Timbre e inarmonicidad | Redacción de resultados |
-| 6 | — | — | Artículo final y diapositivas |
-| 7 | — | — | Ensayos y sustentación |
+| Semana | Frente A: app | Frente B: estimadores | Frente C: datos y evaluación | Juntos |
+|---|---|---|---|---|
+| 0 (→ 18 nov) | — | — | — | Cerrar y entregar propuesta |
+| 1 | Esqueleto, captura, AudioWorklet | FFT + interpolación, HPS | Grabaciones, NSynth, sintéticos | — |
+| 2 | Estimadores en TS, nota y cents | YIN, compuerta, pruebas | Mediciones en Audacity, notebook de métricas | Revisar juntos YIN y HPS |
+| 3 | Presets, detección de cuerda, interfaz | Validación cruzada TS ↔ Python | Primeras métricas sobre sintéticos | Validación cruzada |
+| 4 | Modo depuración, latencia, pulido | Análisis de casos de falla | Barrido de N, curvas de SNR | Análisis de casos de falla |
+| 5 | Despliegue final | Inarmonicidad y estimación de B | Timbre, respuesta del micrófono | Redacción de resultados |
+| 6 | — | — | — | Artículo final y diapositivas |
+| 7 | — | — | — | Ensayos y sustentación |
 
 ---
 
@@ -186,7 +187,7 @@ Con $\hat f$ la estimación y $f_\text{ref}$ la referencia, el error en cents es
 | El navegador ignora las restricciones de audio (Safari, algunos Android) | Leer `getSettings()` del track y mostrar aviso; probar en Chrome y Firefox |
 | Las etiquetas de NSynth no están perfectamente afinadas | Reportar la mediana del error por instrumento y tratar el desfase sistemático aparte |
 | La demo en vivo falla por ruido del salón | Video de respaldo y modo depuración para explicar lo que pasa |
-| Uno de los dos no domina la parte del otro | Sesiones de revisión conjunta en las semanas 2 y 4 |
+| Alguien no domina la parte de los demás | Sesiones de revisión conjunta en las semanas 2 y 4 |
 
 ## Preguntas probables en la sustentación
 
@@ -205,7 +206,7 @@ El artículo final debe declarar qué herramientas de IA se usaron, para qué y 
 
 | Fecha | Herramienta | Para qué | Cómo se verificó |
 |---|---|---|---|
-| 2026-11-14 | Claude Code | Revisión de literatura y borrador de la propuesta | Referencias contrastadas con fuentes en línea; _pendiente: lectura completa del texto por los dos_ |
+| 2026-11-14 | Claude Code | Revisión de literatura y borrador de la propuesta | Referencias contrastadas con fuentes en línea; _pendiente: lectura completa del texto por los tres_ |
 | 2026-11-16 | Claude Code | Este README y plan de trabajo | _Pendiente: revisión del grupo_ |
 
 ## Convenciones
