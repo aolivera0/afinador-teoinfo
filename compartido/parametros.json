@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "_nota": "Valores por defecto comunes a la app (TypeScript) y al análisis (Python). Los marcados en 'provisionales' se calibran en la fase 5; cualquier cambio se hace por PR y lo revisan los tres. Significado de cada campo: docs/contratos.md, sección 3.",
+  "_nota": "Valores por defecto comunes a la app (TypeScript) y al análisis (Python). Los marcados en 'provisionales' se calibran en el bloque 3 (antes del vie 4 dic); cualquier cambio se hace por PR y lo revisan los tres. Significado de cada campo: docs/contratos.md, sección 3.",
   "provisionales": ["compuerta.rms_min_dbfs", "compuerta.entropia_max", "deteccion_cuerda.histeresis_cents"],
 
   "referencia_la4_hz": 440,

@@ -6,7 +6,7 @@ Este documento fija lo que los tres frentes comparten, para que cada uno avance 
 - **Frente B:** estimadores de referencia en Python
 - **Frente C:** datos y evaluación
 
-Si dos implementaciones siguen exactamente lo que dice aquí, deben dar el mismo resultado. Eso es lo que se comprueba en la validación cruzada (fase 4).
+Si dos implementaciones siguen exactamente lo que dice aquí, deben dar el mismo resultado. Eso es lo que se comprueba en la validación cruzada (bloque 3, mié 2 – jue 3 dic).
 
 **Regla de cambios.** Este archivo y la carpeta `compartido/` solo se cambian por PR, con la revisión de los otros dos integrantes. Antes de abrir el PR hay que correr:
 
@@ -40,7 +40,7 @@ Cada frente escribe solo en sus carpetas. Así los merges no chocan.
   - El campo `nota` usa notación en inglés (`E2`, `Eb2`). Es la misma que se usa en los nombres de archivo.
 - [`compartido/parametros.json`](../compartido/parametros.json): valores por defecto de toda la cadena.
   - Ningún valor se escribe a mano en el código: se lee de este archivo.
-  - Los campos listados en `provisionales` se calibran en la fase 5.
+  - Los campos listados en `provisionales` se calibran en el bloque 3, antes de congelar los resultados el vie 4 dic.
 
 ## 3. Parámetros
 
@@ -170,14 +170,38 @@ Todos los CSV usan UTF-8, coma como separador, **punto** como separador decimal 
 ### 5.1 WAV
 
 - PCM mono.
-- Las grabaciones propias van a 48 kHz y 16 bits, recortadas para que la nota empiece en $t \approx 0$.
-- Nombres: `instrumento_nota_cuerda_rep.wav`, con `instrumento` igual al `id` de `afinaciones.json`. Ejemplos: `bajo_E1_c4_r2.wav`, `guitarra_A4_c1_r1.wav` (nota pisada).
+- Las grabaciones propias van a 48 kHz y 16 bits. Cada archivo se recorta por separado para que la nota empiece en $t \approx 0$.
+- Cada ejecución se graba **a la vez con dos cadenas de captura**: una de referencia (interfaz de audio) y una de uso real (micrófono del portátil o del celular). Así, entre los dos archivos de una misma toma solo cambia la captura.
+- Nombres: `instrumento_nota_cuerda_rep_dispositivo.wav`.
+  - `instrumento` es el `id` de `afinaciones.json`.
+  - `nota` usa la notación en inglés (`E1`, `A4`).
+  - `cuerda` es `c` + número de cuerda.
+  - `rep` es `r` + número de repetición.
+  - Lo que va antes de `_dispositivo` identifica la **toma**: los archivos que comparten ese prefijo se grabaron juntos.
+- Códigos de `dispositivo`:
+
+  | Código | Cadena de captura |
+  |---|---|
+  | `di` | Instrumento por línea a la entrada Hi-Z de la interfaz |
+  | `sm57` | Micrófono Shure SM57 a la interfaz |
+  | `portatil` | Micrófono integrado del portátil |
+  | `celular` | Micrófono del celular, con una app que grabe WAV sin compresión ni control automático de ganancia |
+
+  Un código nuevo se agrega a esta tabla por PR antes de usarlo.
+- Ejemplos: `bajo_E1_c4_r2_di.wav` y `bajo_E1_c4_r2_portatil.wav` son la misma toma; `guitarra_A4_c1_r1_sm57.wav` es una nota pisada (cuerda 1, traste 5).
 
 ### 5.2 `datos/grabaciones/lecturas.csv`
 
+Lleva una fila por **archivo**. Los archivos de una misma toma repiten la lectura de los afinadores, porque esa lectura es de la ejecución y no de la captura.
+
 ```
-archivo,instrumento,cuerda,nota_esperada,midi_esperado,repeticion,guitartuna_nota,guitartuna_cents,datuner_nota,datuner_cents,datuner_hz,audacity_hz,dispositivo,fecha,observaciones
+archivo,toma,instrumento,cuerda,nota_esperada,midi_esperado,repeticion,dispositivo,detalle_captura,guitartuna_nota,guitartuna_cents,datuner_nota,datuner_cents,datuner_hz,audacity_hz,fecha,observaciones
 ```
+
+- `toma` es el nombre del archivo sin `_dispositivo.wav`, por ejemplo `bajo_E1_c4_r2`.
+- `dispositivo` es el código de la tabla anterior.
+- `detalle_captura` es texto libre con lo que permita repetir la captura: modelo de la interfaz, distancia y posición del micrófono, ganancia. Por ejemplo: `Interfaz X, SM57 a 20 cm frente a la boca`.
+- `audacity_hz` es propio de cada archivo, porque se mide sobre su espectro.
 
 ### 5.3 `datos/sinteticos/indice.csv`
 
@@ -223,7 +247,7 @@ implementacion,conjunto,archivo,metodo,N,f_ref_hz,f0_hz,cents_error,tramos_activ
 - `cents_error` $= 1200\log_2(f_0/f_\text{ref})$.
 - Si no hay tramos activos en ese intervalo, `f0_hz` y `cents_error` quedan vacíos.
 
-## 6. Validación cruzada (fase 4)
+## 6. Validación cruzada (bloque 3)
 
 Se comparan los CSV por tramo de `python` y `ts`, para el mismo archivo, método, $N$ y tramo:
 
