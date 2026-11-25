@@ -1,0 +1,178 @@
+{
+  "version": 1,
+  "referencia_la4_hz": 440,
+  "convencion": "Cuerdas listadas en orden físico, de la cuerda con número mayor a la cuerda 1 (la más aguda en guitarra y bajo). 'nota' usa notación científica en inglés (E2, Eb2); 'midi' es la fuente de verdad: f = 440 * 2^((midi - 69) / 12).",
+  "instrumentos": [
+    {
+      "id": "guitarra",
+      "nombre": "Guitarra",
+      "afinaciones": [
+        {
+          "id": "estandar",
+          "nombre": "Estándar",
+          "cuerdas": [
+            { "cuerda": 6, "nota": "E2", "midi": 40 },
+            { "cuerda": 5, "nota": "A2", "midi": 45 },
+            { "cuerda": 4, "nota": "D3", "midi": 50 },
+            { "cuerda": 3, "nota": "G3", "midi": 55 },
+            { "cuerda": 2, "nota": "B3", "midi": 59 },
+            { "cuerda": 1, "nota": "E4", "midi": 64 }
+          ]
+        },
+        {
+          "id": "drop-d",
+          "nombre": "Drop D",
+          "cuerdas": [
+            { "cuerda": 6, "nota": "D2", "midi": 38 },
+            { "cuerda": 5, "nota": "A2", "midi": 45 },
+            { "cuerda": 4, "nota": "D3", "midi": 50 },
+            { "cuerda": 3, "nota": "G3", "midi": 55 },
+            { "cuerda": 2, "nota": "B3", "midi": 59 },
+            { "cuerda": 1, "nota": "E4", "midi": 64 }
+          ]
+        },
+        {
+          "id": "medio-tono-abajo",
+          "nombre": "Medio tono abajo",
+          "cuerdas": [
+            { "cuerda": 6, "nota": "Eb2", "midi": 39 },
+            { "cuerda": 5, "nota": "Ab2", "midi": 44 },
+            { "cuerda": 4, "nota": "Db3", "midi": 49 },
+            { "cuerda": 3, "nota": "Gb3", "midi": 54 },
+            { "cuerda": 2, "nota": "Bb3", "midi": 58 },
+            { "cuerda": 1, "nota": "Eb4", "midi": 63 }
+          ]
+        },
+        {
+          "id": "open-g",
+          "nombre": "Open G",
+          "cuerdas": [
+            { "cuerda": 6, "nota": "D2", "midi": 38 },
+            { "cuerda": 5, "nota": "G2", "midi": 43 },
+            { "cuerda": 4, "nota": "D3", "midi": 50 },
+            { "cuerda": 3, "nota": "G3", "midi": 55 },
+            { "cuerda": 2, "nota": "B3", "midi": 59 },
+            { "cuerda": 1, "nota": "D4", "midi": 62 }
+          ]
+        },
+        {
+          "id": "dadgad",
+          "nombre": "DADGAD",
+          "cuerdas": [
+            { "cuerda": 6, "nota": "D2", "midi": 38 },
+            { "cuerda": 5, "nota": "A2", "midi": 45 },
+            { "cuerda": 4, "nota": "D3", "midi": 50 },
+            { "cuerda": 3, "nota": "G3", "midi": 55 },
+            { "cuerda": 2, "nota": "A3", "midi": 57 },
+            { "cuerda": 1, "nota": "D4", "midi": 62 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "bajo",
+      "nombre": "Bajo",
+      "afinaciones": [
+        {
+          "id": "estandar-4",
+          "nombre": "Estándar (4 cuerdas)",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "E1", "midi": 28 },
+            { "cuerda": 3, "nota": "A1", "midi": 33 },
+            { "cuerda": 2, "nota": "D2", "midi": 38 },
+            { "cuerda": 1, "nota": "G2", "midi": 43 }
+          ]
+        },
+        {
+          "id": "drop-d",
+          "nombre": "Drop D (4 cuerdas)",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "D1", "midi": 26 },
+            { "cuerda": 3, "nota": "A1", "midi": 33 },
+            { "cuerda": 2, "nota": "D2", "midi": 38 },
+            { "cuerda": 1, "nota": "G2", "midi": 43 }
+          ]
+        },
+        {
+          "id": "estandar-5",
+          "nombre": "Estándar (5 cuerdas)",
+          "cuerdas": [
+            { "cuerda": 5, "nota": "B0", "midi": 23 },
+            { "cuerda": 4, "nota": "E1", "midi": 28 },
+            { "cuerda": 3, "nota": "A1", "midi": 33 },
+            { "cuerda": 2, "nota": "D2", "midi": 38 },
+            { "cuerda": 1, "nota": "G2", "midi": 43 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ukelele",
+      "nombre": "Ukelele",
+      "afinaciones": [
+        {
+          "id": "estandar",
+          "nombre": "Estándar (reentrante)",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "G4", "midi": 67 },
+            { "cuerda": 3, "nota": "C4", "midi": 60 },
+            { "cuerda": 2, "nota": "E4", "midi": 64 },
+            { "cuerda": 1, "nota": "A4", "midi": 69 }
+          ]
+        },
+        {
+          "id": "low-g",
+          "nombre": "Low G",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "G3", "midi": 55 },
+            { "cuerda": 3, "nota": "C4", "midi": 60 },
+            { "cuerda": 2, "nota": "E4", "midi": 64 },
+            { "cuerda": 1, "nota": "A4", "midi": 69 }
+          ]
+        },
+        {
+          "id": "baritono",
+          "nombre": "Barítono",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "D3", "midi": 50 },
+            { "cuerda": 3, "nota": "G3", "midi": 55 },
+            { "cuerda": 2, "nota": "B3", "midi": 59 },
+            { "cuerda": 1, "nota": "E4", "midi": 64 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "violin",
+      "nombre": "Violín",
+      "afinaciones": [
+        {
+          "id": "estandar",
+          "nombre": "Estándar",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "G3", "midi": 55 },
+            { "cuerda": 3, "nota": "D4", "midi": 62 },
+            { "cuerda": 2, "nota": "A4", "midi": 69 },
+            { "cuerda": 1, "nota": "E5", "midi": 76 }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "chelo",
+      "nombre": "Chelo",
+      "afinaciones": [
+        {
+          "id": "estandar",
+          "nombre": "Estándar",
+          "cuerdas": [
+            { "cuerda": 4, "nota": "C2", "midi": 36 },
+            { "cuerda": 3, "nota": "G2", "midi": 43 },
+            { "cuerda": 2, "nota": "D3", "midi": 50 },
+            { "cuerda": 1, "nota": "A3", "midi": 57 }
+          ]
+        }
+      ]
+    }
+  ]
+}

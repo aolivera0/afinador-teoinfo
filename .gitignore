@@ -26,3 +26,9 @@ datos/nsynth/
 
 # Enunciado del curso (material de la profesora, no se publica)
 Proyectos sugeridos*.pdf
+
+# Resultados por tramo (se regeneran; se versionan solo los resúmenes por nota)
+analisis/resultados/tramos/
+
+# Señales sintéticas: se regeneran desde datos/sinteticos/indice.csv
+datos/sinteticos/*.wav

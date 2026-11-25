@@ -47,16 +47,23 @@ Micrófono ─► Preprocesado ─► Compuerta ──────► Estimador 
 - **App web:** TypeScript + Vite, Web Audio API con `AudioWorklet`. Se captura con `echoCancellation`, `noiseSuppression` y `autoGainControl` desactivados. Se publica en GitHub Pages.
 - **Análisis:** Python (NumPy, SciPy, Matplotlib) en notebooks; aquí salen todas las figuras y tablas del artículo.
 - **Validación cruzada:** los mismos archivos WAV se procesan con la implementación en TypeScript (desde Node) y con la de Python. Las dos deben coincidir con una diferencia menor a 0,1 cents.
+- **Acuerdos entre frentes:** [`docs/contratos.md`](docs/contratos.md) fija la interfaz de cada etapa, los parámetros y los formatos de datos. La tabla de afinaciones y los parámetros por defecto están en [`compartido/`](compartido/).
 
 ### Estructura del repositorio
 
 ```
 propuesta/     Entrega 1 (LaTeX, IEEEtran + biblatex-apa)
 articulo/      Entrega 2 (se crea en la fase 6)
-app/           Aplicación web (TypeScript + Vite)
-analisis/      Notebooks y scripts de Python
-  afinador/    Implementación de referencia de los estimadores
-datos/
+docs/          Acuerdos entre frentes (contratos.md)
+compartido/    afinaciones.json, parametros.json y su verificador
+app/           Aplicación web (TypeScript + Vite)             · Frente A
+analisis/
+  afinador/    Implementación de referencia de los estimadores · Frente B
+  pruebas/     Pruebas de los estimadores                      · Frente B
+  sinteticos/  Generador de señales sintéticas                 · Frente B
+  evaluacion/  Notebooks de métricas, figuras y tablas         · Frente C
+  resultados/  CSV de resultados (por tramo no se versionan)
+datos/                                                         · Frente C
   grabaciones/ WAV propios (48 kHz, 16 bits) + lecturas de los afinadores
   sinteticos/  Señales generadas con f0 conocida
   nsynth/      Subconjunto de NSynth (no se versiona, ver .gitignore)
@@ -67,7 +74,7 @@ sustentacion/  Diapositivas y video de respaldo de la demo
 
 ## Plan de trabajo
 
-Hay tres frentes que avanzan en paralelo y se juntan en la validación cruzada y la evaluación. Todavía no están asignados:
+Hay tres frentes que avanzan en paralelo y se juntan en la validación cruzada y la evaluación. Pueden trabajar sin esperarse porque comparten los acuerdos de [`docs/contratos.md`](docs/contratos.md). Todavía no están asignados:
 
 - **Frente A:** app web
 - **Frente B:** estimadores de referencia en Python
@@ -80,6 +87,9 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [x] Revisión de literatura y referencias verificadas
 - [x] Borrador de la propuesta (3 páginas)
 - [x] Repositorio público en GitHub
+- [x] Borrador de los acuerdos entre frentes (`docs/contratos.md`, `compartido/`)
+- [ ] Revisar y aprobar los acuerdos entre los tres, antes de escribir código
+- [ ] Agregar a los tres como colaboradores del repositorio
 - [ ] Lectura completa de la propuesta por los tres y ajustes finales
 - [ ] Entregar la propuesta
 
@@ -88,16 +98,18 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [ ] Protocolo de grabación (ver abajo) y grabación de guitarra, bajo y ukelele
 - [ ] Anotar la lectura de GuitarTuna y DaTuner para cada grabación en `datos/grabaciones/lecturas.csv`
 - [ ] Medir $f_0$ a mano en Audacity (Analizar → Trazar espectro) para cada grabación
-- [ ] Descargar el subconjunto de prueba de NSynth y filtrar las notas acústicas de guitarra, bajo y cuerdas dentro del rango de la tabla de afinaciones
-- [ ] Generador de señales sintéticas: tonos armónicos con $f_0$ exacta, sin fundamental, con inarmonicidad $B$ y con ruido gaussiano de SNR conocida
+- [ ] Descargar el subconjunto de prueba de NSynth, filtrar las notas acústicas de guitarra, bajo y cuerdas dentro del rango de la tabla de afinaciones y generar `datos/indice_nsynth.csv`
+- [ ] Notebook de métricas montado con `librosa.yin` como estimador provisional, leyendo los CSV de resultados del formato acordado (se cambia por los estimadores de B cuando estén)
 
 ### Fase 2: Estimadores de referencia en Python (semanas 1–2) · Frente B
 
+- [ ] Generador de señales sintéticas: tonos armónicos con $f_0$ exacta, sin fundamental, con inarmonicidad $B$ y con ruido gaussiano de SNR conocida; escribe `datos/sinteticos/indice.csv`
 - [ ] Pico de FFT con ventana de Hann, zero-padding e interpolación parabólica
 - [ ] HPS con $R$ armónicos configurable
 - [ ] YIN: función de diferencia, normalización acumulada, umbral e interpolación parabólica
 - [ ] Compuerta con RMS y entropía espectral normalizada $H$
-- [ ] Conversión a nota MIDI y cents; tabla de afinaciones compartida (JSON) con la app
+- [ ] Conversión a nota MIDI y cents, leyendo `compartido/afinaciones.json` y `compartido/parametros.json`
+- [ ] Script que procesa un conjunto de WAV y escribe los CSV de resultados por tramo y por nota
 - [ ] Pruebas con señales sintéticas: error < 1 cent a SNR alta para los tres métodos
 
 ### Fase 3: App web (semanas 1–3) · Frente A
@@ -105,7 +117,7 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 - [ ] Esqueleto con Vite + TypeScript y despliegue automático en GitHub Pages (GitHub Actions)
 - [ ] Captura del micrófono con las restricciones de audio desactivadas y aviso si el navegador no las respeta
 - [ ] `AudioWorklet` que acumula tramos de $N$ muestras con salto configurable
-- [ ] Portar los tres estimadores a TypeScript, con selector de método en la interfaz
+- [ ] Implementar los tres estimadores en TypeScript siguiendo `docs/contratos.md` (sin esperar al frente B), con selector de método en la interfaz
 - [ ] Nota y cents con suavizado por mediana
 - [ ] Modo por instrumento: lista de afinaciones y detección de cuerda con histéresis
 - [ ] Modo cromático
@@ -147,9 +159,9 @@ El cronograma está en semanas relativas a partir de la entrega de la propuesta.
 | Semana | Frente A: app | Frente B: estimadores | Frente C: datos y evaluación | Juntos |
 |---|---|---|---|---|
 | 0 (→ 18 nov) | — | — | — | Cerrar y entregar propuesta |
-| 1 | Esqueleto, captura, AudioWorklet | FFT + interpolación, HPS | Grabaciones, NSynth, sintéticos | — |
-| 2 | Estimadores en TS, nota y cents | YIN, compuerta, pruebas | Mediciones en Audacity, notebook de métricas | Revisar juntos YIN y HPS |
-| 3 | Presets, detección de cuerda, interfaz | Validación cruzada TS ↔ Python | Primeras métricas sobre sintéticos | Validación cruzada |
+| 1 | Esqueleto, captura, AudioWorklet | Generador sintético, FFT + interpolación | Grabaciones, índice de NSynth | Aprobar `docs/contratos.md` |
+| 2 | Estimadores en TS, nota y cents | HPS, YIN, compuerta, pruebas | Mediciones en Audacity, notebook de métricas con `librosa.yin` | Revisar juntos YIN y HPS |
+| 3 | Presets, detección de cuerda, interfaz | Validación cruzada TS ↔ Python | Métricas con los estimadores de B | Validación cruzada |
 | 4 | Modo depuración, latencia, pulido | Análisis de casos de falla | Barrido de N, curvas de SNR | Análisis de casos de falla |
 | 5 | Despliegue final | Inarmonicidad y estimación de B | Timbre, respuesta del micrófono | Redacción de resultados |
 | 6 | — | — | — | Artículo final y diapositivas |
@@ -208,9 +220,11 @@ El artículo final debe declarar qué herramientas de IA se usaron, para qué y 
 |---|---|---|---|
 | 2026-11-14 | Claude Code | Revisión de literatura y borrador de la propuesta | Referencias contrastadas con fuentes en línea; _pendiente: lectura completa del texto por los tres_ |
 | 2026-11-16 | Claude Code | Este README y plan de trabajo | _Pendiente: revisión del grupo_ |
+| 2026-11-25 | Claude Code | Acuerdos entre frentes (`docs/contratos.md`, `compartido/`) | Tabla de afinaciones contrastada con `verificar_compartido.py` (nombre ↔ MIDI, rango, YIN); _pendiente: revisión del grupo_ |
 
 ## Convenciones
 
 - Commits en español, en imperativo («Agregar…», «Corregir…»).
-- Ramas por tarea (`app/detector-cuerda`, `analisis/yin`) y merge a `main` cuando funcione.
+- Ramas por tarea con el prefijo de su carpeta (`app/detector-cuerda`, `analisis/yin`) y entrada a `main` por PR con al menos una revisión. Los cambios a `compartido/` o a `docs/contratos.md` los revisan los otros dos.
+- Los parámetros no se escriben a mano en el código: se leen de `compartido/parametros.json`.
 - Los datos grandes (NSynth) no se versionan; las grabaciones propias sí, porque son pequeñas.
