@@ -218,6 +218,14 @@ archivo,fs_hz,duracion_s,f0_hz,n_armonicos,decaimiento_db_por_armonico,sin_funda
 
 Este índice se versiona; los audios no, porque `datos/nsynth/` está en `.gitignore`.
 
+NSynth viene a 16 kHz. Para que $N$ y el salto duren lo mismo en todos los conjuntos y el barrido de $N$ sea comparable, las notas elegidas se **remuestrean a 48 kHz** con `scipy.signal.resample_poly` (factor 3, con su filtro antialiasing) y se guardan en `datos/nsynth/48k/`. Por encima de 8 kHz no hay contenido, porque el original no lo tiene.
+
+El subconjunto y el índice los genera `analisis/evaluacion/indice_nsynth.py` a partir del conjunto de prueba (`nsynth-test`):
+
+- familias `bass`, `guitar` y `string`;
+- fuentes `acoustic` y `electronic`. El conjunto de prueba no tiene bajo acústico: el bajo solo aparece como `electronic` (eléctrico grabado en directo, comparable a un bajo por línea) o `synthetic`. Se excluyen los sintéticos;
+- MIDI dentro del rango de `compartido/afinaciones.json`.
+
 ```
 archivo,instrumento_nsynth,familia,fuente,midi,f_ref_hz,velocidad
 ```
@@ -257,7 +265,13 @@ Se comparan los CSV por tramo de `python` y `ts`, para el mismo archivo, método
 
 ## 7. Herramientas
 
-- **Python ≥ 3.11:** `numpy`, `scipy`, `matplotlib`, `soundfile`.
+- **Python ≥ 3.11:** las dependencias están en `analisis/requirements.txt`. El entorno virtual va en `analisis/.venv/`, que no se versiona:
+
+  ```bash
+  python3 -m venv analisis/.venv
+  analisis/.venv/bin/pip install -r analisis/requirements.txt
+  ```
+
   - `librosa` solo lo usa C, como estimador provisional (`librosa.yin`, con `implementacion = librosa`) mientras no existan los de B, y luego como punto de comparación.
 - **Node ≥ 20 y TypeScript:** la lectura de WAV en Node queda a criterio del frente A.
 

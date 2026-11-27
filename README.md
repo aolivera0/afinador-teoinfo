@@ -74,11 +74,11 @@ sustentacion/  Diapositivas y video de respaldo de la demo
 
 ## Plan de trabajo
 
-Hay tres frentes que avanzan en paralelo y se juntan en la validación cruzada y la evaluación. Pueden trabajar sin esperarse porque comparten los acuerdos de [`docs/contratos.md`](docs/contratos.md). Todavía no están asignados:
+Hay tres frentes que avanzan en paralelo y se juntan en la validación cruzada y la evaluación. Pueden trabajar sin esperarse porque comparten los acuerdos de [`docs/contratos.md`](docs/contratos.md):
 
-- **Frente A:** app web
-- **Frente B:** estimadores de referencia en Python
-- **Frente C:** datos y evaluación
+- **Frente A:** app web · _sin asignar_
+- **Frente B:** estimadores de referencia en Python · _sin asignar_
+- **Frente C:** datos y evaluación · Angel
 
 El artículo se entrega el **miércoles 9 de diciembre**, así que hay dos semanas desde el 25 de noviembre. El plan está organizado en cuatro bloques con fecha. Cada tarea lleva su frente entre corchetes, y las marcadas con ★ son imprescindibles para el artículo. Si el tiempo no alcanza, se recorta en el orden de la lista [Qué recortar primero](#qué-recortar-primero).
 
@@ -134,8 +134,9 @@ El artículo se entrega el **miércoles 9 de diciembre**, así que hay dos seman
 **Frente C, datos y evaluación**
 
 - [ ] ★ Grabaciones completas con las dos cadenas a la vez (ver [Protocolo de grabación](#protocolo-de-grabación)) y `datos/grabaciones/lecturas.csv` con las lecturas de GuitarTuna y DaTuner
-- [ ] ★ Descargar el conjunto de prueba de NSynth, filtrar las notas acústicas de guitarra, bajo y cuerdas dentro del rango de la tabla de afinaciones y generar `datos/indice_nsynth.csv`
-- [ ] ★ Notebook de métricas, leyendo los CSV del formato acordado, con `librosa.yin` como estimador provisional (se cambia por los de B cuando estén)
+- [x] ★ Descargar el conjunto de prueba de NSynth, filtrar las notas acústicas y eléctricas (no sintéticas) de guitarra, bajo y cuerdas dentro del rango de la tabla de afinaciones y generar `datos/indice_nsynth.csv`
+- [x] ★ Notebook de métricas ([`analisis/evaluacion/evaluacion.ipynb`](analisis/evaluacion/evaluacion.ipynb)), leyendo los CSV del formato acordado, con `librosa.yin` como estimador provisional (se cambia por los de B cuando estén)
+- [x] Planilla de la sesión de grabación ([`datos/grabaciones/planilla.md`](datos/grabaciones/planilla.md)) y `lecturas.csv` prellenado
 
 ### Bloque 3: Validación y evaluación (mié 2 – vie 4 dic)
 
@@ -273,6 +274,7 @@ El artículo final debe declarar qué herramientas de IA se usaron, para qué y 
 | 2026-11-14 | Claude Code | Revisión de literatura y borrador de la propuesta | Referencias contrastadas con fuentes en línea; _pendiente: lectura completa del texto por los tres_ |
 | 2026-11-16 | Claude Code | Este README y plan de trabajo | _Pendiente: revisión del grupo_ |
 | 2026-11-25 | Claude Code | Acuerdos entre frentes (`docs/contratos.md`, `compartido/`) | Tabla de afinaciones contrastada con `verificar_compartido.py` (nombre ↔ MIDI, rango, YIN); _pendiente: revisión del grupo_ |
+| 2026-11-26 | Claude Code | Pipeline de evaluación del frente C: índice de NSynth, cadena provisional con `librosa.yin`, métricas, notebook y planilla | 23 pruebas automáticas (tonos sintéticos con f0 conocida, casos límite del resumen y de las métricas, filtro de NSynth); revisión del error por instrumento de NSynth; _pendiente: revisión de Angel_ |
 
 ## Convenciones
 

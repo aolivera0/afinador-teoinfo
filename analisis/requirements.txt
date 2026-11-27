@@ -1,0 +1,11 @@
+# Dependencias de Python del análisis (frentes B y C). Python >= 3.11.
+numpy>=2.0
+scipy>=1.13
+matplotlib>=3.9
+soundfile>=0.12
+pandas>=2.2
+librosa>=0.10
+pytest>=8.0
+jupyter>=1.0
+nbformat>=5.10
+nbconvert>=7.16
